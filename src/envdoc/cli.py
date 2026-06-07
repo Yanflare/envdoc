@@ -1,8 +1,6 @@
 """envdoc CLI entry point."""
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 from rich.console import Console
 
@@ -13,13 +11,9 @@ app = typer.Typer(
 )
 
 console = Console()
-
-
 @app.callback()
 def callback() -> None:
     """envdoc — auto-document your environment variables."""
-
-
 @app.command()
 def scan(
     path: str = typer.Argument(".", help="Path to scan (file or directory)."),
@@ -29,7 +23,7 @@ def scan(
     check: bool = typer.Option(
         False, "--check", help="Exit non-zero if .env.example is stale."
     ),
-    output: Optional[str] = typer.Option(
+    output: str | None = typer.Option(
         None, "--output", "-o", help="Write output to file instead of stdout."
     ),
 ) -> None:
@@ -37,7 +31,5 @@ def scan(
     console.print(f"[bold cyan]envdoc[/] scanning [green]{path}[/] …")
     console.print("[yellow]⚠[/]  Core scanner not yet implemented — coming in v0.1.0.")
     raise typer.Exit(code=0)
-
-
 if __name__ == "__main__":
     app()
