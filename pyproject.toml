@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "envdoc"
+version = "0.1.0"
+description = "Scan Python codebases for env var usage and auto-generate .env.example + Markdown config reference"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Yanflare", email = "yanakiewkr@gmail.com" }]
+keywords = ["cli", "devtools", "environment", "dotenv", "documentation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Utilities",
+]
+requires-python = ">=3.10"
+dependencies = [
+  "typer>=0.12.0",
+  "rich>=13.0.0",
+  "libcst>=1.1.0",
+  "pathspec>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-cov>=5.0.0",
+  "ruff>=0.4.0",
+  "mypy>=1.10.0",
+]
+
+[project.scripts]
+envdoc = "envdoc.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/Yanflare/envdoc"
+Repository = "https://github.com/Yanflare/envdoc"
+Issues = "https://github.com/Yanflare/envdoc/issues"
+Changelog = "https://github.com/Yanflare/envdoc/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/envdoc"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=envdoc --cov-report=term-missing"
