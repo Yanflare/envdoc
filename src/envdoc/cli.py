@@ -1,6 +1,7 @@
 """envdoc CLI entry point."""
-
 from __future__ import annotations
+
+from typing import Optional
 
 import typer
 from rich.console import Console
@@ -10,15 +11,27 @@ app = typer.Typer(
     help="Scan a Python codebase for env var usage and generate .env.example / Markdown docs.",
     add_completion=False,
 )
+
 console = Console()
+
+
+@app.callback()
+def callback() -> None:
+    """envdoc — auto-document your environment variables."""
 
 
 @app.command()
 def scan(
     path: str = typer.Argument(".", help="Path to scan (file or directory)."),
-    format: str = typer.Option("dotenv", "--format", "-f", help="Output format: dotenv | markdown"),
-    check: bool = typer.Option(False, "--check", help="Exit non-zero if .env.example is stale."),
-    output: str = typer.Option(None, "--output", "-o", help="Write output to file instead of stdout."),
+    output_format: str = typer.Option(
+        "dotenv", "--format", "-f", help="Output format: dotenv | markdown"
+    ),
+    check: bool = typer.Option(
+        False, "--check", help="Exit non-zero if .env.example is stale."
+    ),
+    output: Optional[str] = typer.Option(
+        None, "--output", "-o", help="Write output to file instead of stdout."
+    ),
 ) -> None:
     """Scan PATH for environment variable usage and generate documentation."""
     console.print(f"[bold cyan]envdoc[/] scanning [green]{path}[/] …")
