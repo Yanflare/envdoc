@@ -1,4 +1,5 @@
 """Smoke tests — verify CLI entry point loads cleanly."""
+
 from typer.testing import CliRunner
 
 from envdoc.cli import app
