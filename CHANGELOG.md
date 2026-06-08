@@ -1,11 +1,30 @@
 # Changelog
 
-All notable changes to this project will be documented here.
-Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-Versioning: [SemVer](https://semver.org/).
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-08
+
 ### Added
-- CLI entry point `envdoc scan` (stub — scanner implementation in progress)
-- Project scaffold: pyproject.toml, CI workflow, issue templates
+- `envdoc scan <path>` command — scans a Python codebase for env var usage
+- libcst-based visitor detects `os.getenv()`, `os.environ[]`, and `os.environ.get()` patterns
+- Captures key name, default value, source file, and line number for each detected variable
+- `.gitignore` respect — skips files and directories matched by the nearest `.gitignore`
+- `--format dotenv` output (default) — generates a documented `.env.example` with source comments
+- `--format markdown` output — generates a Markdown config-reference table
+- `--output <file>` flag — writes output to a file instead of stdout
+- `--check` mode — exits non-zero when `.env.example` is missing or stale; CI-ready
+- 27-test suite covering scanner patterns, output formats, and check mode (92% coverage)
+
+### Infrastructure
+- Hatchling build backend with `pyproject.toml`
+- CI matrix (Python 3.10 / 3.11 / 3.12) via GitHub Actions
+- PyPI publish workflow via OIDC trusted publisher (`release.yml`)
+- ruff lint + format, mypy --strict, pytest + coverage enforcement
+
+[Unreleased]: https://github.com/Yanflare/envdoc/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Yanflare/envdoc/releases/tag/v0.1.0
