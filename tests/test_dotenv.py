@@ -4,10 +4,7 @@ from __future__ import annotations
 import textwrap
 from pathlib import Path
 
-import pytest
-
 from envdoc.scanner import scan_file
-
 
 # ---------------------------------------------------------------------------
 # Helpers
