@@ -260,6 +260,147 @@ class _PydanticSettingsVisitor(cst.CSTVisitor):
         return None
 
 
+
+# ---------------------------------------------------------------------------
+# python-dotenv detection
+# ---------------------------------------------------------------------------
+_DOTENV_FUNC_MODULES = frozenset({"dotenv"})
+_DOTENV_FUNCS = frozenset({"load_dotenv", "dotenv_values"})
+
+
+class _DotenvVisitor(cst.CSTVisitor):
+    """Detect python-dotenv usage and surface the referenced .env paths.
+
+    Handles::
+
+        from dotenv import load_dotenv
+        load_dotenv()                        # generic: notes .env at runtime
+        load_dotenv(".env.production")       # positional path
+        load_dotenv(dotenv_path=".env.prod") # keyword path
+
+        from dotenv import dotenv_values
+        dotenv_values(".env")                # positional path
+
+        import dotenv
+        dotenv.load_dotenv(dotenv_path=".env.staging")
+    """
+
+    METADATA_DEPENDENCIES = (PositionProvider,)
+
+    def __init__(self, source_file: Path) -> None:
+        self.source_file = source_file
+        self.found: list[EnvVar] = []
+        self._local_names: dict[str, str] = {}
+        self._dotenv_module_alias: set[str] = set()
+
+    def visit_ImportFrom(self, node: cst.ImportFrom) -> bool | None:
+        if not isinstance(node.names, (list, tuple)):
+            return None
+        if node.module is None:
+            return None
+        if isinstance(node.module, cst.Name):
+            module_name = node.module.value
+        elif isinstance(node.module, cst.Attribute):
+            parts: list[str] = []
+            m: cst.BaseExpression = node.module
+            while isinstance(m, cst.Attribute):
+                parts.append(m.attr.value)
+                m = m.value
+            if isinstance(m, cst.Name):
+                parts.append(m.value)
+            module_name = ".".join(reversed(parts))
+        else:
+            return None
+        if module_name not in _DOTENV_FUNC_MODULES:
+            return None
+        for alias in node.names:
+            if not isinstance(alias, cst.ImportAlias):
+                continue
+            imported_name = (
+                alias.name.value if isinstance(alias.name, cst.Name) else None
+            )
+            if imported_name not in _DOTENV_FUNCS:
+                continue
+            local_name = imported_name
+            if (
+                alias.asname is not None
+                and isinstance(alias.asname, cst.AsName)
+                and isinstance(alias.asname.name, cst.Name)
+            ):
+                local_name = alias.asname.name.value
+            self._local_names[local_name] = imported_name
+        return None
+
+    def visit_Import(self, node: cst.Import) -> bool | None:
+        if not isinstance(node.names, (list, tuple)):
+            return None
+        for alias in node.names:
+            if not isinstance(alias, cst.ImportAlias):
+                continue
+            if not isinstance(alias.name, cst.Name):
+                continue
+            if alias.name.value != "dotenv":
+                continue
+            if (
+                alias.asname is not None
+                and isinstance(alias.asname, cst.AsName)
+                and isinstance(alias.asname.name, cst.Name)
+            ):
+                local = alias.asname.name.value
+            else:
+                local = "dotenv"
+            self._dotenv_module_alias.add(local)
+        return None
+
+    def _resolve_call_func(self, node: cst.Call) -> str | None:
+        func = node.func
+        if isinstance(func, cst.Name):
+            return self._local_names.get(func.value)
+        if (
+            isinstance(func, cst.Attribute)
+            and isinstance(func.value, cst.Name)
+            and func.value.value in self._dotenv_module_alias
+            and func.attr.value in _DOTENV_FUNCS
+        ):
+            return func.attr.value
+        return None
+
+    def _extract_path_arg(self, node: cst.Call) -> str | None:
+        for arg in node.args:
+            if arg.keyword is not None and arg.keyword.value == "dotenv_path":
+                return self._str_value(arg.value)
+        positional = [a for a in node.args if a.keyword is None]
+        if positional:
+            return self._str_value(positional[0].value)
+        return None
+
+    def _str_value(self, node: cst.BaseExpression) -> str | None:
+        import ast as _ast
+        if isinstance(node, cst.SimpleString):
+            try:
+                val = _ast.literal_eval(node.value)
+                return val if isinstance(val, str) else None
+            except (ValueError, SyntaxError):
+                return None
+        return None
+
+    def visit_Call(self, node: cst.Call) -> bool | None:
+        canonical = self._resolve_call_func(node)
+        if canonical is None:
+            return None
+        env_path = self._extract_path_arg(node)
+        key = f"# dotenv:{env_path}" if env_path is not None else "# dotenv:.env"
+        pos = self.get_metadata(PositionProvider, node)
+        self.found.append(
+            EnvVar(
+                key=key,
+                default=None,
+                source_file=self.source_file,
+                line_number=pos.start.line,
+            )
+        )
+        return None
+
 def scan_file(path: Path) -> list[EnvVar]:
     """Parse one Python file and return all detected env var references."""
     try:
@@ -272,7 +413,9 @@ def scan_file(path: Path) -> list[EnvVar]:
         settings_visitor = _PydanticSettingsVisitor(path)
         MetadataWrapper(module).visit(settings_visitor)
 
-        return env_visitor.found + settings_visitor.found
+        dotenv_visitor = _DotenvVisitor(path)
+        MetadataWrapper(module).visit(dotenv_visitor)
+        return env_visitor.found + settings_visitor.found + dotenv_visitor.found
     except Exception:  # skip files with parse or encoding errors
         return []
 

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-12
+### Added
+- Detect `python-dotenv` usage (`load_dotenv`, `dotenv_values`) and surface
+  referenced `.env` file paths in generated output (closes #2)
+- Handles positional path, `dotenv_path=` keyword argument, bare calls, and
+  aliased imports (`from dotenv import load_dotenv as ld`)
+- Handles namespace import style (`import dotenv; dotenv.load_dotenv(...)`)
+- 11 new tests in `tests/test_dotenv.py`; total 50 tests, 91% coverage
+
 ## [0.2.0] - 2026-06-11
 
 ### Added
@@ -35,5 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PyPI publish workflow via OIDC trusted publisher (`release.yml`)
 - ruff lint + format, mypy --strict, pytest + coverage enforcement
 
-[Unreleased]: https://github.com/Yanflare/envdoc/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Yanflare/envdoc/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Yanflare/envdoc/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/Yanflare/envdoc/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Yanflare/envdoc/releases/tag/v0.1.0
