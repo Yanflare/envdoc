@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "envdoc"
-version = "0.1.0"
+version = "0.2.0"
 description = "Scan Python codebases for env var usage and auto-generate .env.example + Markdown config reference"
 readme = "README.md"
 license = { text = "MIT" }

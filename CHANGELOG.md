@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-11
+
+### Added
+- Detect environment variables declared as annotated fields on Pydantic
+  `BaseSettings` subclasses (`pydantic-settings` v2 and `pydantic` v1 compat)
+- Handles aliased imports (`from pydantic_settings import BaseSettings as BS`)
+- Skips private fields (`_name`) and `model_config` (pydantic v2 config dict)
+- 11 new tests for BaseSettings detection; coverage 91%
+
 ## [0.1.0] - 2026-06-08
 
 ### Added
