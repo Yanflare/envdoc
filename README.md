@@ -1,6 +1,7 @@
 # envdoc
 
 > Scan your Python codebase for environment variable usage. Auto-generate `.env.example` and a Markdown config reference.
+[![codecov](https://codecov.io/github/Yanflare/envdoc/graph/badge.svg)](https://codecov.io/github/Yanflare/envdoc)
 
 [![CI](https://github.com/Yanflare/envdoc/actions/workflows/ci.yml/badge.svg)](https://github.com/Yanflare/envdoc/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/envdoc)](https://pypi.org/project/envdoc/)
