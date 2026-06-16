@@ -12,6 +12,7 @@ incomplete, outdated, or missing entirely, so I built a solution which eliminate
 scanning your codebase and generating the documentation that should have been there already.
 
 $ envdoc scan ./src
+
 Found 7 environment variables in 12 files
 
 ANTHROPIC_API_KEY     src/llm/client.py:14
