@@ -10,8 +10,8 @@
 I keep noticing the same pattern in Python projects, where environment variable documentation is
 incomplete, outdated, or missing entirely, so I built a solution which eliminates config errors by
 scanning your codebase and generating the documentation that should have been there already.
-$ envdoc scan ./src
 
+$ envdoc scan ./src
 Found 7 environment variables in 12 files
 
 ANTHROPIC_API_KEY     src/llm/client.py:14
