@@ -1,25 +1,33 @@
 # envdoc
+> Your .env.example should write itself.
 
-> Scan your Python codebase for environment variable usage. Auto-generate `.env.example` and a Markdown config reference.
 [![codecov](https://codecov.io/github/Yanflare/envdoc/graph/badge.svg)](https://codecov.io/github/Yanflare/envdoc)
-
 [![CI](https://github.com/Yanflare/envdoc/actions/workflows/ci.yml/badge.svg)](https://github.com/Yanflare/envdoc/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/envdoc)](https://pypi.org/project/envdoc/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Every project has undocumented environment variables. Someone runs it cold, nothing works, and
-there's no `.env.example` to tell them what's missing. `envdoc` fixes that — it scans your code,
-finds every `os.getenv`, `os.environ`, and common pattern, and writes the documentation for you.
+I keep noticing the same pattern in Python projects, where environment variable documentation is
+incomplete, outdated, or missing entirely, so I built a solution which eliminates config errors by
+scanning your codebase and generating the documentation that should have been there already.
 $ envdoc scan ./src
+
 Found 7 environment variables in 12 files
+
 ANTHROPIC_API_KEY     src/llm/client.py:14
+
 DATABASE_URL          src/db/connection.py:8
+
 LOG_LEVEL             src/app.py:22
+
 PORT                  src/app.py:31
+
 REDIS_URL             src/cache.py:11
+
 SECRET_KEY            src/auth.py:9
+
 SENTRY_DSN            src/monitoring.py:4
+
 Generated: .env.example
 
 ---
@@ -30,7 +38,7 @@ Generated: .env.example
 pip install envdoc
 ```
 
-## Usage
+## Features
 
 ```bash
 # Scan and write .env.example
@@ -46,7 +54,7 @@ envdoc scan ./src --check
 envdoc scan ./src --output docs/config.md --format markdown
 ```
 
-## CI integration
+### CI integration
 
 ```yaml
 - name: Check .env.example is up to date
@@ -70,7 +78,7 @@ Any new env var added to the codebase without updating `.env.example` fails the 
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
